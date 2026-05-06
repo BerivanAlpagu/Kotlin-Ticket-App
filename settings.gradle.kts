@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "TicketPass"
 include(":app")
+include(":core")
+include(":data")
