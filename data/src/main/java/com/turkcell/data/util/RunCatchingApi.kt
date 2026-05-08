@@ -18,3 +18,5 @@ suspend inline fun <T> runCatchingApi(crossinline block: suspend () -> T): Resul
 {
     Result.failure(e)
 }
+
+//1- bir ekranda koin ile (araştır) authrepository

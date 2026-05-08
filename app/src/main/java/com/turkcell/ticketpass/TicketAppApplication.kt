@@ -1,5 +1,6 @@
 package com.turkcell.ticketpass
 import android.app.Application
+import com.turkcell.data.di.dataModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -12,10 +13,9 @@ class TicketAppApplication : Application() {
         super.onCreate()
         startKoin {
             androidLogger()
-            androidContext(this@TicketAppApplication) //
-            modules(
+            androidContext(this@TicketAppApplication) // Uygulama contexti verilir.
+            modules(dataModule)
 
-            )
         }
     }
 }
