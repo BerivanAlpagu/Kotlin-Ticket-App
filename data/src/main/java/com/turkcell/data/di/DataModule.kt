@@ -11,39 +11,54 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 
-val dataModule = module {
 
-    // 1. Logger — Logcat'te isteği görmek için
+private const val BASE_URL = "https://tickets-api.halitkalayci.com/"
+
+val dataModule = module {
+    // Scope (Kapsam)
+    // 3 temel seçenek
+
+    // Yaşam döngüsündeki bağımlılığın davranış biçimi
+
+    // Single (Singleton) -> Uygulama yaşam döngüsü boyunca tek örnek.
+    single {
+        Json {
+            ignoreUnknownKeys = true // Cevapta var olan ama classta olmayan alanları ignore et.
+            explicitNulls = false
+            isLenient = true
+        }
+    }
+
     single {
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
-    // 2. OkHttpClient — İnternetin kendisi
+    // HTTP isteklerini yönetmek..
     single {
         OkHttpClient.Builder()
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
     }
 
-    // 3. Retrofit — Sunucuya bağlanan araç
     single {
-        val json = Json { ignoreUnknownKeys = true }
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/") // Emülatörden localhost'a bağlanmak için
-            .client(get())
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .baseUrl(BASE_URL)
+            .client(get<OkHttpClient>())
+            .addConverterFactory(get<Json>().asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
-    // 4. AuthApi — Sunucudaki login/register endpointleri
-    single<AuthApi> {
-        get<Retrofit>().create(AuthApi::class.java)
+    single { get<Retrofit>().create(AuthApi::class.java) }
+
+    single<AuthRepository> {
+        AuthRepositoryImpl(
+            authApi = get()
+        )
     }
 
-    // 5. AuthRepository — Koin'e "AuthRepository istenince AuthRepositoryImpl ver" de
-    single<AuthRepository> {
-        AuthRepositoryImpl(get())
-    }
+    // factory -> Her çağırıldığı noktada yeni instance üretir. Her fonksiyon için birer örnek
+
+    // scoped -> Class -> tüm fonksiyonlarına 1 örnek
 }

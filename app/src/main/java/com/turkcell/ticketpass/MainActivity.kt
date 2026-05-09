@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import com.turkcell.core.domain.AuthRepository
 import com.turkcell.core.ui.theme.TicketAppTheme
+import com.turkcell.ticketpass.navigation.AppNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,17 +25,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        //API isteği atıyorum
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("TicketPass", ">>> Login isteği atılıyor")
-        }
-
         setContent {
             TicketAppTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Text("App is ready")
                 }
+                AppNavHost()
             }
         }
     }
