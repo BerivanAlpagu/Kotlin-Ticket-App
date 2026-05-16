@@ -1,8 +1,11 @@
 package com.turkcell.data.di
 
 import com.turkcell.core.domain.AuthRepository
+import com.turkcell.data.local.TokenStore
+import com.turkcell.data.network.AuthInterceptor
 import com.turkcell.data.remote.AuthApi
 import com.turkcell.data.repository.AuthRepositoryImpl
+import com.turkcell.data.repository.TokenAuthenticator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -35,10 +38,24 @@ val dataModule = module {
         }
     }
 
+    single {
+        TokenStore(context = get())
+    }
+
+    single { AuthInterceptor(tokenStore = get()) }
+
+    single {
+        TokenAuthenticator(
+            tokenStore = get()
+        )
+    }
+
     // HTTP isteklerini yönetmek..
     single {
         OkHttpClient.Builder()
+            .addInterceptor(get<AuthInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
+            .authenticator(get<TokenAuthenticator>())
             .build()
     }
 
@@ -54,7 +71,8 @@ val dataModule = module {
 
     single<AuthRepository> {
         AuthRepositoryImpl(
-            authApi = get()
+            authApi = get(),
+            tokenStore= get()
         )
     }
 
