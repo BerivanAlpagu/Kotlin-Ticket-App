@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import com.turkcell.domain.AuthRepository
+import com.turkcell.core.domain.auth.AuthRepository
 import com.turkcell.core.ui.theme.TicketAppTheme
 import com.turkcell.ticketpass.navigation.AppNavHost
 import org.koin.android.ext.android.inject

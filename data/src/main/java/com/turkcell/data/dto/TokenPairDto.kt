@@ -1,5 +1,6 @@
 package com.turkcell.data.dto.auth
 
+import com.turkcell.data.dto.UserDto
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,6 +1,5 @@
 package com.turkcell.data.mapper
 
-
 import com.turkcell.core.domain.event.Event
 import com.turkcell.core.domain.event.TicketType
 import com.turkcell.data.dto.event.EventDto

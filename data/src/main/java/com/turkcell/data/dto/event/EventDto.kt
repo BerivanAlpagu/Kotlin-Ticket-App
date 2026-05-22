@@ -11,5 +11,4 @@ data class EventDto(
     val startsAt: String,
     val endsAt: String,
     val ticketTypes: List<TicketTypeDto> = emptyList()
-) {
-}
+)

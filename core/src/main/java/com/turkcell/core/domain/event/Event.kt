@@ -1,4 +1,4 @@
-package com.turkcell.domain.event
+package com.turkcell.core.domain.event
 
 data class Event(
     val id: String,
