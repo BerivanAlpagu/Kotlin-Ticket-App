@@ -1,10 +1,10 @@
 package com.turkcell.data.repository
 
-import com.turkcell.core.domain.AuthRepository
-import com.turkcell.core.domain.AuthSession
-import com.turkcell.core.domain.User
-import com.turkcell.core.domain.UserRole
-import com.turkcell.data.dto.CredentialsDto
+import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.core.domain.auth.AuthSession
+import com.turkcell.core.domain.auth.User
+import com.turkcell.core.domain.auth.UserRole
+import com.turkcell.data.dto.auth.CredentialsDto
 import com.turkcell.data.local.TokenStore
 import com.turkcell.data.remote.AuthApi
 import com.turkcell.data.util.runCatchingApi
@@ -46,7 +46,7 @@ class AuthRepositoryImpl(
     ): Result<AuthSession> = runCatchingApi {
         authApi.register(CredentialsDto(email=email, password=password))
     }.onSuccess {
-        // jwt'i bi yere yaz..
+        tokenStore.save(it.accessToken, it.refreshToken)
     }
         .map {
                 i -> AuthSession(

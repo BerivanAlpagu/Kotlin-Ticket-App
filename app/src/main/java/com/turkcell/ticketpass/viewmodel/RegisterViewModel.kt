@@ -2,7 +2,7 @@ package com.turkcell.ticketpass.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.turkcell.core.domain.AuthRepository
+import com.turkcell.domain.AuthRepository
 import com.turkcell.data.network.ApiException
 import com.turkcell.data.network.NetworkException
 import kotlinx.coroutines.flow.MutableStateFlow

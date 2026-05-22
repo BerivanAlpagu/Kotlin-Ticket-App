@@ -13,11 +13,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.turkcell.core.domain.AuthRepository
+import com.turkcell.domain.AuthRepository
 import com.turkcell.ticketpass.screen.LoginScreen
 import com.turkcell.ticketpass.screen.RegisterScreen
 import org.koin.compose.koinInject
-
 
 @Composable
 fun AppNavHost(

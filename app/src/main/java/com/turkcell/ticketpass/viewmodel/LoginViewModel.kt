@@ -3,7 +3,6 @@ package com.turkcell.ticketpass.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.turkcell.core.domain.AuthRepository
 import com.turkcell.data.network.ApiException
 import com.turkcell.data.network.NetworkException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.turkcell.core.domain.auth.AuthRepository
 //register screen geliştir, viewmodelle ihtiyaç var gene modelde hataları geliştir.logindeki yapıyı register yapsıı kur.
 
 data class LoginUiState(val email: String = "",

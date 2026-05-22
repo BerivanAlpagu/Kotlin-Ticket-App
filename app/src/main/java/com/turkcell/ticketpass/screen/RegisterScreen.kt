@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.ticketpass.viewmodel.RegisterViewModel
 import org.koin.androidx.compose.koinViewModel
 
+// RegisterScreen'i geliştirelim..
 @Composable
 fun RegisterScreen(
     // koinViewModel() → Koin'den RegisterViewModel'i çekiyor.

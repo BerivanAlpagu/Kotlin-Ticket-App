@@ -1,8 +1,8 @@
 package com.turkcell.data.remote
 
-import com.turkcell.data.dto.CredentialsDto
-import com.turkcell.data.dto.RefreshRequestDto
-import com.turkcell.data.dto.TokenPairDto
+import com.turkcell.data.dto.auth.CredentialsDto
+import com.turkcell.data.dto.auth.RefreshRequestDto
+import com.turkcell.data.dto.auth.TokenPairDto
 import retrofit2.http.Body
 import retrofit2.http.POST
 

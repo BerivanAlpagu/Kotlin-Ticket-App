@@ -1,7 +1,6 @@
 package com.turkcell.ticketpass
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,12 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import com.turkcell.core.domain.AuthRepository
+import com.turkcell.domain.AuthRepository
 import com.turkcell.core.ui.theme.TicketAppTheme
 import com.turkcell.ticketpass.navigation.AppNavHost
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {

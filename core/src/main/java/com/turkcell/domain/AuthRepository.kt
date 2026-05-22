@@ -1,4 +1,4 @@
-package com.turkcell.core.domain
+package com.turkcell.core.domain.auth
 
 import kotlinx.coroutines.flow.Flow
 
