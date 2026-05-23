@@ -1,6 +1,7 @@
 package com.turkcell.data.di
 
 import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.core.domain.event.EventRepository
 import com.turkcell.data.local.TokenStore
 import com.turkcell.data.network.AuthInterceptor
 import com.turkcell.data.remote.AuthApi
@@ -14,6 +15,8 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.core.qualifier.named
+import com.turkcell.data.remote.EventApi
+import com.turkcell.data.repository.EventRepositoryImpl
 
 private const val BASE_URL = "https://tickets-api.halitkalayci.com/"
 
@@ -97,6 +100,9 @@ val dataModule = module {
         get<Retrofit>().create(AuthApi::class.java)
     }
 
+    single {
+        get<Retrofit>().create(EventApi::class.java)
+    }
     single<AuthRepository> {
         AuthRepositoryImpl(
             authApi = get(),
@@ -107,4 +113,9 @@ val dataModule = module {
     // factory -> Her çağırıldığı noktada yeni instance üretir. Her fonksiyon için birer örnek
 
     // scoped -> Class -> tüm fonksiyonlarına 1 örnek
+    single<EventRepository> {
+        EventRepositoryImpl(
+            eventApi = get()
+        )
+    }
 }
