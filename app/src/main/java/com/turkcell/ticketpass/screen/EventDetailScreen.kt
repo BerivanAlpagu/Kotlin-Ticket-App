@@ -38,8 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.event.Event
 import com.turkcell.core.domain.event.TicketType
+import com.turkcell.core.util.DataFormatter
 import com.turkcell.ticketpass.viewmodel.EventDetailViewModel
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Button
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +62,30 @@ fun EventDetailScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (state.totalCents > 0) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Toplam: ₺${state.totalCents / 100}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Button(onClick = { /* Satın al işlemi buraya (Adım 3) */ }) {
+                            Text("Satın Al")
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         when {
@@ -85,6 +112,8 @@ fun EventDetailScreen(
             state.event != null -> {
                 EventDetailContent(
                     event = state.event!!,
+                    selectedTickets = state.selectedTickets,
+                    onQuantityChange = viewModel::updateTicketQuantity,
                     modifier = Modifier.padding(innerPadding)
                 )
             }
@@ -93,7 +122,12 @@ fun EventDetailScreen(
 }
 
 @Composable
-private fun EventDetailContent(event: Event, modifier: Modifier = Modifier) {
+private fun EventDetailContent(
+    event: Event,
+    selectedTickets: Map<String, Int>,
+    onQuantityChange: (String, Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -143,7 +177,7 @@ private fun EventDetailContent(event: Event, modifier: Modifier = Modifier) {
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(text = event.startsAt, style = MaterialTheme.typography.bodyLarge)
+                Text(text = DataFormatter.formatDate(event.startsAt), style = MaterialTheme.typography.bodyLarge)
             }
         }
 
@@ -168,7 +202,12 @@ private fun EventDetailContent(event: Event, modifier: Modifier = Modifier) {
             }
 
             items(items = event.ticketTypes, key = { it.id }) { ticketType ->
-                TicketTypeCard(ticketType)
+                val quantity = selectedTickets[ticketType.id] ?: 0
+                TicketTypeCard(
+                    ticketType = ticketType,
+                    quantity = quantity,
+                    onQuantityChange = { delta -> onQuantityChange(ticketType.id, delta) }
+                )
             }
         }
 
@@ -177,7 +216,11 @@ private fun EventDetailContent(event: Event, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TicketTypeCard(ticketType: TicketType) {
+private fun TicketTypeCard(
+    ticketType: TicketType,
+    quantity: Int,
+    onQuantityChange: (Int) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -189,7 +232,7 @@ private fun TicketTypeCard(ticketType: TicketType) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = ticketType.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -202,12 +245,34 @@ private fun TicketTypeCard(ticketType: TicketType) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Text(
-                text = "₺${ticketType.priceCents / 100}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "₺${ticketType.priceCents / 100}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { onQuantityChange(-1) },
+                        enabled = quantity > 0
+                    ) {
+                        Text("-", style = MaterialTheme.typography.titleLarge)
+                    }
+                    Text(
+                        text = quantity.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    IconButton(
+                        onClick = { onQuantityChange(1) },
+                        enabled = quantity < minOf(20, ticketType.remaining)
+                    ) {
+                        Text("+", style = MaterialTheme.typography.titleLarge)
+                    }
+                }
+            }
         }
     }
 }

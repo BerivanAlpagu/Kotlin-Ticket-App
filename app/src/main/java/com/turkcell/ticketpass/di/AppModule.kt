@@ -9,6 +9,7 @@ import com.turkcell.ticketpass.viewmodel.HomeViewModel
 
 val appModule = module {
     viewModelOf(::LoginViewModel)
+    viewModelOf(::RegisterViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::EventDetailViewModel)
 }

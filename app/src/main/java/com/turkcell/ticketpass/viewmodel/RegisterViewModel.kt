@@ -12,18 +12,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// STATE 
-// LoginUiState'ten farkı:
-//   "isLoggedIn" → "isRegistered" oldu
-// Diğer her şey (email, password, isLoading, errorMessage) aynı.
+private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+
 data class RegisterUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isRegistered: Boolean = false   // ← Login'de "isLoggedIn" vardı
+    val isRegistered: Boolean = false
 ) {
-    val canSubmit: Boolean get() = email.isNotBlank() && password.length >= 8 && !isLoading
+    val canSubmit: Boolean get() = email.matches(emailRegex) && password.length in 8..128 && !isLoading
 }
 
 

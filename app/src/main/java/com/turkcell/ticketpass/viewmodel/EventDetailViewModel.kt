@@ -14,8 +14,13 @@ import kotlinx.coroutines.launch
 data class EventDetailUiState(
     val isLoading: Boolean = false,
     val event: Event? = null,
-    val error: String? = null
-)
+    val error: String? = null,
+    val selectedTickets: Map<String, Int> = emptyMap()
+) {
+    val totalCents: Long get() = event?.ticketTypes?.sumOf { ticketType ->
+        (selectedTickets[ticketType.id] ?: 0).toLong() * ticketType.priceCents
+    } ?: 0L
+}
 
 class EventDetailViewModel(
     private val eventRepository: EventRepository,
@@ -46,5 +51,22 @@ class EventDetailViewModel(
                 }
             )
         }
+    }
+
+    fun updateTicketQuantity(ticketTypeId: String, delta: Int) {
+        val currentEvent = _state.value.event ?: return
+        val ticketType = currentEvent.ticketTypes.find { it.id == ticketTypeId } ?: return
+        
+        val currentQty = _state.value.selectedTickets[ticketTypeId] ?: 0
+        val newQty = (currentQty + delta).coerceIn(0, minOf(20, ticketType.remaining.toInt()))
+        
+        val newMap = _state.value.selectedTickets.toMutableMap()
+        if (newQty == 0) {
+            newMap.remove(ticketTypeId)
+        } else {
+            newMap[ticketTypeId] = newQty
+        }
+        
+        _state.update { it.copy(selectedTickets = newMap) }
     }
 }
