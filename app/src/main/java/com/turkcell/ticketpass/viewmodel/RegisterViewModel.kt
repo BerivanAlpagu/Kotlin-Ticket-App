@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// --- STATE ---
+// STATE 
 // LoginUiState'ten farkı:
 //   "isLoggedIn" → "isRegistered" oldu
 // Diğer her şey (email, password, isLoading, errorMessage) aynı.

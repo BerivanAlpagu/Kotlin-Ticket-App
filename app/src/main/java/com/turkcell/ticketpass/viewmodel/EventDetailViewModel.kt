@@ -1,0 +1,50 @@
+package com.turkcell.ticketpass.viewmodel
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.turkcell.core.domain.event.Event
+import com.turkcell.core.domain.event.EventRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class EventDetailUiState(
+    val isLoading: Boolean = false,
+    val event: Event? = null,
+    val error: String? = null
+)
+
+class EventDetailViewModel(
+    private val eventRepository: EventRepository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val eventId: String = checkNotNull(savedStateHandle["eventId"])
+
+    private val _state = MutableStateFlow(EventDetailUiState())
+    val state: StateFlow<EventDetailUiState> = _state.asStateFlow()
+
+    init {
+        loadEvent()
+    }
+
+    fun loadEvent() {
+        if (_state.value.isLoading) return
+
+        _state.update { it.copy(isLoading = true, error = null) }
+
+        viewModelScope.launch {
+            eventRepository.getEventById(eventId).fold(
+                onSuccess = { event ->
+                    _state.update { it.copy(event = event, isLoading = false, error = null) }
+                },
+                onFailure = { e ->
+                    _state.update { it.copy(isLoading = false, error = e.message ?: "Etkinlik yüklenemedi.") }
+                }
+            )
+        }
+    }
+}

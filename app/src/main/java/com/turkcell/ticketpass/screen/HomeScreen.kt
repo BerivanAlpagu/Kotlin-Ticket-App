@@ -33,6 +33,7 @@ import com.turkcell.core.domain.event.Event
 
 @Composable
 fun HomeScreen(
+    onEventClick: (String) -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -42,8 +43,12 @@ fun HomeScreen(
             Text("Yaklaşan Etkinlikler")
             Spacer(Modifier.height(8.dp))
 
-            //halit hocanınki
-            EventsRow(isLoading = state.isEventsLoading, error=state.eventsError, events=state.events)
+            EventsRow(
+                isLoading = state.isEventsLoading,
+                error = state.eventsError,
+                events = state.events,
+                onEventClick = onEventClick
+            )
 
 
             Spacer(Modifier.height(8.dp))
@@ -56,7 +61,8 @@ fun HomeScreen(
 private fun EventsRow(
     isLoading: Boolean,
     error: String?,
-    events: List<Event>
+    events: List<Event>,
+    onEventClick: (String) -> Unit
 ) {
     when {
         isLoading -> {
@@ -72,16 +78,19 @@ private fun EventsRow(
         }
         else -> {
             LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
-                items(items=events, key = {it.id}) {event -> EventCard(event)}
+                items(items=events, key = {it.id}) { event ->
+                    EventCard(event = event, onClick = { onEventClick(event.id) })
+                }
             }
         }
     }
 }
 
 @Composable
-private fun EventCard(event: Event)
+private fun EventCard(event: Event, onClick: () -> Unit)
 {
     Card(
+        onClick = onClick,
         modifier = Modifier.width(260.dp).height(280.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

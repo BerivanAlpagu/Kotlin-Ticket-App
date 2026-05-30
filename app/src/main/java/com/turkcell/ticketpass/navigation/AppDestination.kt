@@ -1,6 +1,5 @@
 package com.turkcell.ticketpass.navigation
 
-// navhost.route.login yerine obje yazdık nachost çağırabilsin diye
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,3 +8,5 @@ object Login
 object Register
 @Serializable
 object Home
+@Serializable
+data class EventDetail(val eventId: String)

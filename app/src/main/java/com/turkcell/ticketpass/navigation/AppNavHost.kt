@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.ticketpass.screen.EventDetailScreen
 import com.turkcell.ticketpass.screen.HomeScreen
 import com.turkcell.ticketpass.screen.LoginScreen
 import com.turkcell.ticketpass.screen.RegisterScreen
@@ -45,7 +46,16 @@ private fun SplashScreen(){
 private fun AuthedNavHost(navController: NavHostController){
     NavHost(navController=navController, startDestination = Home){
         composable<Home> {
-            HomeScreen()
+            HomeScreen(
+                onEventClick = { eventId ->
+                    navController.navigate(EventDetail(eventId = eventId))
+                }
+            )
+        }
+        composable<EventDetail> {
+            EventDetailScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
