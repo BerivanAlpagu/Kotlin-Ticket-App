@@ -5,6 +5,7 @@ import com.turkcell.core.domain.auth.AuthSession
 import com.turkcell.core.domain.auth.User
 import com.turkcell.core.domain.auth.UserRole
 import com.turkcell.data.dto.auth.CredentialsDto
+import com.turkcell.data.dto.auth.RefreshRequestDto
 import com.turkcell.data.local.TokenStore
 import com.turkcell.data.remote.AuthApi
 import com.turkcell.data.util.runCatchingApi
@@ -36,7 +37,6 @@ class AuthRepositoryImpl(
 
     /// backend -> (TokenPairDto) accessToken
     /// backend -> (TokenPairDto) jwt
-
     /// backend -> (TokenPairDto) accessToken -> (AuthSession) accessToken -> Tüm Uygulama
     /// backend -> (TokenPairDto) jwt -> (AuthSession) accessToken -> Tüm Uygulama
 
@@ -59,6 +59,13 @@ class AuthRepositoryImpl(
 
 
     override suspend fun logout(): Result<Unit> {
-        TODO("Not yet implemented")
+        val refresh = tokenStore.refreshTokenBlocking()
+        return runCatchingApi {
+            if (refresh != null) {
+                authApi.logout(RefreshRequestDto(refresh))
+            }
+        }.also {
+            tokenStore.clear()
+        }.map {}
     }
 }

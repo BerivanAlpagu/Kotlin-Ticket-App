@@ -3,9 +3,7 @@ package com.turkcell.ticketpass.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.auth.AuthRepository
-
-import com.turkcell.data.network.ApiException
-import com.turkcell.data.network.NetworkException
+import com.turkcell.core.util.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,20 +52,9 @@ class RegisterViewModel(
                 }
                 .onFailure { error ->
                     _state.update {
-                        it.copy(isLoading = false, errorMessage = error.toUserMessage())
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(extraCodes = mapOf(409 to "Bu email zaten kayıtlı.")))
                     }
                 }
         }
-    }
-
-    //   401 (şifre hatalı) yerine 409 (email zaten kayıtlı) olacak
-    internal fun Throwable.toUserMessage(): String = when (this) {
-        is ApiException -> when (code) {
-            409 -> "Bu email zaten kayıtlı"           // ← Register'a özel
-            in 500..599 -> "Sunucu şu anda cevap veremiyor"
-            else -> "Beklenmeyen bir hata oluştu"
-        }
-        is NetworkException -> "İnternet bağlantısı yok"
-        else -> message ?: "Bilinmeyen bir hata oluştu."
     }
 }

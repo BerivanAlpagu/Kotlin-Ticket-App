@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,16 +45,42 @@ import com.turkcell.ticketpass.viewmodel.EventDetailViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.turkcell.ticketpass.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToMyTickets: () -> Unit = {},
     viewModel: EventDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumeError()
+        }
+    }
+
+    LaunchedEffect(state.completedPurchase) {
+        state.completedPurchase?.let {
+            snackbarHostState.showSnackbar(context.getString(R.string.purchase_success))
+            viewModel.consumeCompletedPurchase()
+            onNavigateToMyTickets()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(state.event?.name ?: "Etkinlik Detayı") },
@@ -80,42 +108,58 @@ fun EventDetailScreen(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        Button(onClick = { /* Satın al işlemi buraya (Adım 3) */ }) {
-                            Text("Satın Al")
+                        Button(
+                            onClick = viewModel::buyTickets,
+                            enabled = !state.isPurchasing
+                        ) {
+                            if (state.isPurchasing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            } else {
+                                Text("Satın Al")
+                            }
                         }
                     }
                 }
             }
         }
     ) { innerPadding ->
-        when {
-            state.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        PullToRefreshBox(
+            isRefreshing = state.isLoading,
+            onRefresh = viewModel::loadEvent,
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
+        ) {
+            when {
+                state.isLoading && state.event == null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
-            state.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = state.error!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge
+                state.error != null && state.event == null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.error!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                state.event != null -> {
+                    EventDetailContent(
+                        event = state.event!!,
+                        selectedTickets = state.selectedTickets,
+                        onQuantityChange = viewModel::updateTicketQuantity
                     )
                 }
-            }
-            state.event != null -> {
-                EventDetailContent(
-                    event = state.event!!,
-                    selectedTickets = state.selectedTickets,
-                    onQuantityChange = viewModel::updateTicketQuantity,
-                    modifier = Modifier.padding(innerPadding)
-                )
             }
         }
     }

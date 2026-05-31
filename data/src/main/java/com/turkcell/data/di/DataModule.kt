@@ -15,8 +15,14 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.core.qualifier.named
+import com.turkcell.core.domain.purchase.PurchaseRepository
+import com.turkcell.core.domain.ticket.TicketRepository
 import com.turkcell.data.remote.EventApi
+import com.turkcell.data.remote.MeApi
+import com.turkcell.data.remote.PurchaseApi
 import com.turkcell.data.repository.EventRepositoryImpl
+import com.turkcell.data.repository.PurchaseRepositoryImpl
+import com.turkcell.data.repository.TicketRepositoryImpl
 
 private const val BASE_URL = "https://tickets-api.halitkalayci.com/"
 
@@ -116,6 +122,26 @@ val dataModule = module {
     single<EventRepository> {
         EventRepositoryImpl(
             eventApi = get()
+        )
+    }
+
+    single {
+        get<Retrofit>().create(PurchaseApi::class.java)
+    }
+
+    single<PurchaseRepository> {
+        PurchaseRepositoryImpl(
+            purchaseApi = get()
+        )
+    }
+
+    single {
+        get<Retrofit>().create(MeApi::class.java)
+    }
+
+    single<TicketRepository> {
+        TicketRepositoryImpl(
+            meApi = get()
         )
     }
 }

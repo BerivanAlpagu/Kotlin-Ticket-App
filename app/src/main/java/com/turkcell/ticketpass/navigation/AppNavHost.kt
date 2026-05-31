@@ -17,7 +17,9 @@ import com.turkcell.core.domain.auth.AuthRepository
 import com.turkcell.ticketpass.screen.EventDetailScreen
 import com.turkcell.ticketpass.screen.HomeScreen
 import com.turkcell.ticketpass.screen.LoginScreen
+import com.turkcell.ticketpass.screen.MyTicketsScreen
 import com.turkcell.ticketpass.screen.RegisterScreen
+import com.turkcell.ticketpass.screen.TicketDetailScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -49,11 +51,34 @@ private fun AuthedNavHost(navController: NavHostController){
             HomeScreen(
                 onEventClick = { eventId ->
                     navController.navigate(EventDetail(eventId = eventId))
+                },
+                onMyTicketsClick = {
+                    navController.navigate(MyTickets)
                 }
             )
         }
         composable<EventDetail> {
             EventDetailScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToMyTickets = {
+                    navController.navigate(MyTickets) {
+                        popUpTo(Home) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+        composable<MyTickets> {
+            MyTicketsScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onTicketClick = { ticketId ->
+                    navController.navigate(TicketDetail(ticketId = ticketId))
+                }
+            )
+        }
+        composable<TicketDetail> {
+            TicketDetailScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

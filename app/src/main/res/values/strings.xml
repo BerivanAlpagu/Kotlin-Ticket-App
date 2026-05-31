@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">TicketPass</string>
+    <string name="title_my_tickets">Biletlerim</string>
+    <string name="title_ticket_detail">Bilet Detayı</string>
+    <string name="back">Geri</string>
+    <string name="status_used">Kullanıldı</string>
+    <string name="status_valid">Kullanılabilir</string>
+    <string name="status_valid_detail">Geçerli Bilet</string>
+    <string name="ticket_type_label">BİLET TÜRÜ</string>
+    <string name="price_label">FİYAT</string>
+    <string name="paid_amount_label">ÖDENEN TUTAR</string>
+    <string name="empty_tickets_title">Henüz biletiniz bulunmuyor</string>
+    <string name="empty_tickets_desc">Harika etkinlikleri keşfedip bilet almak için ana sayfaya göz atabilirsiniz.</string>
+    <string name="explore_events">Etkinlikleri Keşfet</string>
+    <string name="error_load_tickets">Biletler Yüklenemedi</string>
+    <string name="error_load_ticket_detail">Bilet Detayı Yüklenemedi</string>
+    <string name="retry">Tekrar Dene</string>
+    <string name="brightness_tip">Lütfen bu ekranı kapıdaki görevliye okutun. QR kodun daha kolay okunabilmesi için ekran parlaklığı otomatik olarak artırılmıştır.</string>
+    <string name="view_my_tickets">Biletlerimi Görüntüle</string>
+    <string name="view_my_tickets_desc">Satın aldığınız tüm biletleri görün ve giriş için hazır edin</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="purchase_success">Bilet başarıyla satın alındı!</string>
 </resources>

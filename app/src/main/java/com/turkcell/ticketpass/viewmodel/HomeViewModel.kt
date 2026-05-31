@@ -2,6 +2,7 @@ package com.turkcell.ticketpass.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.turkcell.core.domain.auth.AuthRepository
 import com.turkcell.core.domain.event.Event
 import com.turkcell.core.domain.event.EventRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +17,18 @@ data class HomeUiState(
     val eventsError: String? = null
 )
 
-class HomeViewModel(private val eventRepository: EventRepository) : ViewModel() {
+class HomeViewModel(
+    private val eventRepository: EventRepository,
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
+        }
+    }
 
     init {
         loadEvents()
