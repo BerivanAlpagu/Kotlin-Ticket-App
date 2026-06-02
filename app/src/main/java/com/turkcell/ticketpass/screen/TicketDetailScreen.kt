@@ -3,8 +3,6 @@ package com.turkcell.ticketpass.screen
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,15 +23,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.zxing.BarcodeFormat
-import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.turkcell.ticketpass.component.QrCodeImage
 import com.turkcell.core.domain.ticket.MyTicket
 import com.turkcell.core.util.DataFormatter
 import com.turkcell.ticketpass.R
@@ -115,9 +110,6 @@ private fun TicketDetailCard(ticket: MyTicket) {
     val isUsed = ticket.status.uppercase() == "USED"
     val statusText = if (isUsed) stringResource(id = R.string.status_used) else stringResource(id = R.string.status_valid_detail)
     val statusColor = if (isUsed) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
-
-    // Generate QR bitmap offline from only the qrCode (UUID string) payload
-    val qrBitmap = rememberQrCodeBitmap(content = ticket.qrCode, sizePx = 600)
 
     Column(
         modifier = Modifier
@@ -224,15 +216,10 @@ private fun TicketDetailCard(ticket: MyTicket) {
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (qrBitmap != null) {
-                        Image(
-                            bitmap = qrBitmap.asImageBitmap(),
-                            contentDescription = "Giriş QR Kodu",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    }
+                    QrCodeImage(
+                        content = ticket.qrCode,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -304,17 +291,6 @@ private fun TicketDetailCard(ticket: MyTicket) {
     }
 }
 
-@Composable
-private fun rememberQrCodeBitmap(content: String, sizePx: Int): Bitmap? {
-    return remember(content, sizePx) {
-        try {
-            val barcodeEncoder = BarcodeEncoder()
-            barcodeEncoder.encodeBitmap(content, BarcodeFormat.QR_CODE, sizePx, sizePx)
-        } catch (e: Exception) {
-            null
-        }
-    }
-}
 
 @Composable
 private fun ErrorState(

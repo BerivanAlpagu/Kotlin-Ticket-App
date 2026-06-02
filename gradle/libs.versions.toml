@@ -19,6 +19,7 @@ navigationCompose = "2.8.4"
 lifecycleViewModelCompose = "2.8.7"
 lifecycleRuntimeCompose = "2.10.0"
 zxing-android-embedded = "4.3.0"
+qrCodeKotlin = "4.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +53,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewModelCompose" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxing-android-embedded" }
+
+qrcode-kotlin = {group="io.github.g0dkar", name="qrcode-kotlin",version.ref= "qrCodeKotlin"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

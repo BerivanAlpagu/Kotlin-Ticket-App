@@ -14,9 +14,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.ticketpass.screen.CheckinScreen
 import com.turkcell.ticketpass.screen.EventDetailScreen
 import com.turkcell.ticketpass.screen.HomeScreen
 import com.turkcell.ticketpass.screen.LoginScreen
+import com.turkcell.ticketpass.screen.MyPurchasesScreen
 import com.turkcell.ticketpass.screen.MyTicketsScreen
 import com.turkcell.ticketpass.screen.RegisterScreen
 import com.turkcell.ticketpass.screen.TicketDetailScreen
@@ -54,6 +56,12 @@ private fun AuthedNavHost(navController: NavHostController){
                 },
                 onMyTicketsClick = {
                     navController.navigate(MyTickets)
+                },
+                onMyPurchasesClick = {
+                    navController.navigate(MyPurchases)
+                },
+                onCheckinClick = {
+                    navController.navigate(Checkin)
                 }
             )
         }
@@ -81,6 +89,14 @@ private fun AuthedNavHost(navController: NavHostController){
             TicketDetailScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
+        }
+        composable<MyPurchases> {
+            MyPurchasesScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable<Checkin> {
+            CheckinScreen()
         }
     }
 }

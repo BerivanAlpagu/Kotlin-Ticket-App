@@ -22,7 +22,9 @@ class TicketDetailViewModel(
     private val ticketRepository: TicketRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val ticketId: String = checkNotNull(savedStateHandle["ticketId"])
+    private val ticketId: String = savedStateHandle.get<String>("ticketId")
+        ?: error("TicketDetailViewModel: 'ticketId' SavedStateHandle'da bulunamadı. Navigation route'unu kontrol et.")
+
 
     private val _state = MutableStateFlow(TicketDetailUiState())
     val state: StateFlow<TicketDetailUiState> = _state.asStateFlow()

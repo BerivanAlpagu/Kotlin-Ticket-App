@@ -17,6 +17,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,12 +44,17 @@ import com.turkcell.ticketpass.viewmodel.HomeViewModel
 import androidx.compose.ui.res.stringResource
 import com.turkcell.ticketpass.R
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onEventClick: (String) -> Unit = {},
     onMyTicketsClick: () -> Unit = {},
+    onMyPurchasesClick: () -> Unit = {},
+    onCheckinClick: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -69,64 +77,165 @@ fun HomeScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(modifier = Modifier.fillMaxSize().padding(vertical = 16.dp)) {
-                Text(
-                    text = "Yaklaşan Etkinlikler",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-                Spacer(Modifier.height(12.dp))
+                .padding(paddingValues)) {
+            PullToRefreshBox(
+                isRefreshing = state.isEventsRefreshing,
+                onRefresh = viewModel::refreshEvents,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(modifier = Modifier.fillMaxSize().padding(vertical = 16.dp)) {
+                    Text(
+                        text = "Yaklaşan Etkinlikler",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(Modifier.height(12.dp))
 
-                EventsRow(
-                    isLoading = state.isEventsLoading,
-                    error = state.eventsError,
-                    events = state.events,
-                    onEventClick = onEventClick
-                )
+                    EventsRow(
+                        isLoading = state.isEventsLoading,
+                        error = state.eventsError,
+                        events = state.events,
+                        onEventClick = onEventClick
+                    )
 
-                Spacer(Modifier.height(24.dp))
-                
-                Text(
-                    text = stringResource(id = R.string.title_my_tickets),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-                Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(24.dp))
 
-                Card(
-                    onClick = onMyTicketsClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(
+                    Text(
+                        text = stringResource(id = R.string.title_my_tickets),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+                    // Biletlerim kartı
+                    Card(
+                        onClick = onMyTicketsClick,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(horizontal = 24.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(id = R.string.view_my_tickets),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ConfirmationNumber,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(28.dp)
                             )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = stringResource(id = R.string.view_my_tickets_desc),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(id = R.string.view_my_tickets),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(id = R.string.view_my_tickets_desc),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Satın Alımlarım kartı
+                    Card(
+                        onClick = onMyPurchasesClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(28.dp)
                             )
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Satın Alımlarım",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Tüm satın alımları görüntüle, bekleyen ödemeleri tamamla",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Görevli Girişi kartı
+                    Card(
+                        onClick = onCheckinClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.QrCodeScanner,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Görevli — QR Check-in",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Kapı görevlisi bilet tarama ekranı",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                                )
+                            }
                         }
                     }
                 }
