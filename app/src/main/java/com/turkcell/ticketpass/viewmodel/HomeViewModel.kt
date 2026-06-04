@@ -2,7 +2,6 @@ package com.turkcell.ticketpass.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.turkcell.core.domain.auth.AuthRepository
 import com.turkcell.core.domain.event.Event
 import com.turkcell.core.domain.event.EventRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,18 +17,9 @@ data class HomeUiState(
     val eventsError: String? = null
 )
 
-class HomeViewModel(
-    private val eventRepository: EventRepository,
-    private val authRepository: AuthRepository
-) : ViewModel() {
+class HomeViewModel(private val eventRepository: EventRepository) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
-
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
-        }
-    }
 
     init {
         loadEvents()
@@ -45,23 +35,20 @@ class HomeViewModel(
 
     fun refreshEvents() {
         if (_state.value.isEventsRefreshing) return
-
         _state.update { it.copy(isEventsRefreshing = true, eventsError = null) }
-
         fetchEvents()
     }
 
     private fun fetchEvents() {
         viewModelScope.launch {
             eventRepository.getEvents().fold(
-                onSuccess = {
-                        list -> _state.update { it.copy(events = list, isEventsLoading = false, eventsError = null)}
+                onSuccess = { list ->
+                    _state.update { it.copy(events = list, isEventsLoading = false, eventsError = null) }
                 },
-                onFailure = {
-                        e -> _state.update { it.copy(isEventsLoading = false, eventsError = e.message ?: "Etkinlikler yüklenemedi.") }
+                onFailure = { e ->
+                    _state.update { it.copy(isEventsLoading = false, eventsError = e.message ?: "Etkinlikler yüklenemedi.") }
                 }
             )
         }
     }
-
 }

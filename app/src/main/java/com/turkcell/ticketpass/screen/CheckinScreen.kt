@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -80,11 +79,11 @@ fun CheckinScreen(
     LaunchedEffect(state.error) {
         if (state.error != null) {
             val message = when (state.error) {
-                is CheckinError.NotFound -> "❌ Bilet bulunamadı — Sahte veya geçersiz QR"
-                is CheckinError.NotAssigned -> "⛔ Bu etkinliğe atanmamışsınız"
-                is CheckinError.AlreadyUsed -> "⚠️ Bu bilet zaten kullanılmış"
+                is CheckinError.NotFound -> "Bilet bulunamadı — Sahte veya geçersiz QR"
+                is CheckinError.NotAssigned -> "Bu etkinliğe atanmamışsınız"
+                is CheckinError.AlreadyUsed -> "Bu bilet zaten kullanılmış"
                 is CheckinError.Unknown -> (state.error as CheckinError.Unknown).message
-                null -> return@LaunchedEffect
+                else -> return@LaunchedEffect
             }
             snackbarHostState.showSnackbar(
                 message = message,
@@ -129,11 +128,11 @@ fun CheckinScreen(
                             onClick = { onScanClick() },
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.QrCodeScanner,
-                                contentDescription = "QR Tara",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(64.dp)
+                            Text(
+                                text = "TARA",
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.titleLarge
                             )
                         }
                     }
@@ -148,6 +147,8 @@ fun CheckinScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Yukarıdaki simgeye dokunarak\nkamerayı açın",
@@ -179,7 +180,7 @@ fun CheckinScreen(
             // İlk açılışta henüz tarama yoksa bilgi metni
             if (state.lastResult == null && !state.isScanning) {
                 Text(
-                    text = "Henüz bilet taranmadı.\nYukarıdaki butona dokunarak\nQR taramaya başlayın.",
+                    text = "Henüz bilet taranmadı. Butona dokunarak QR taramaya başlayın.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -230,7 +231,7 @@ private fun CheckinResultCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "✅ Giriş Onaylandı",
+                text = "Giriş Onaylandı",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF4CAF50)
@@ -307,12 +308,6 @@ private fun CheckinResultCard(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = Icons.Filled.QrCodeScanner,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text("Yeni Bilet Tara", fontWeight = FontWeight.Bold)
             }
         }

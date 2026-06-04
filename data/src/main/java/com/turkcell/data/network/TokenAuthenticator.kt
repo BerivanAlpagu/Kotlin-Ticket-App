@@ -3,7 +3,9 @@ package com.turkcell.data.network
 import com.turkcell.data.dto.auth.RefreshRequestDto
 import com.turkcell.data.local.TokenStore
 import com.turkcell.data.remote.AuthApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -18,7 +20,7 @@ class TokenAuthenticator(
         // İsteğin tekrar tekrar buraya düşmesi -> refresh olsa bile 401 gelebilir
         if(response.priorResponseCount() >= 1) return null
         // İstek 401'e düştüğü anda, eğer sistemde jwt-refresh pairi tanımlıysa git refresh ile yeni jwt alıp isteği tekrar dene.
-        val refreshToken = tokenStore.refreshTokenBlocking() ?: return null;
+        val refreshToken = tokenStore.refreshTokenBlocking() ?: return null
 
         //... bu token ile jwt yenilemeye çalış..
         return synchronized(this) // lock
@@ -43,7 +45,10 @@ class TokenAuthenticator(
                 return@synchronized null
             }
 
-            tokenStore.saveBlocking(newPair.accessToken, newPair.refreshToken)
+            val currentRole = runBlocking { tokenStore.userRole.first() } ?: "USER"
+            // hocam burada hata aldım, rolede 3 parametre alan fonksiyon yazdım ama 2 parametre çağırıyor tokenauthenticatior fonksiyonu.
+            tokenStore.saveBlocking(newPair.accessToken, newPair.refreshToken, currentRole)
+
             response.request.signWith(newPair.accessToken)
         }
     }
